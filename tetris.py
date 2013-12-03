@@ -1,5 +1,6 @@
 # Author: adhit
 # https://github.com/adhit/tetris/blob/master/tetris.py
+# Modified version removes music
 
 import os,sys
 import pygame
@@ -81,6 +82,17 @@ class Square():
         pygame.draw.rect(screen,self.color,pygame.Rect((x-HALF_WIDTH,y-HALF_WIDTH),(FULL_WIDTH,FULL_WIDTH)))
         pygame.draw.lines(screen,LINE_COLOR,True,corners,LINE_WIDTH)
         screen.unlock()
+
+# Added by Louis
+LINE_SHAPE = 0
+T_SHAPE = 1
+SQUARE_SHAPE = 2
+INVERT_Z_SHAPE = 3
+Z_SHAPE = 4
+INVERT_L_SHAPE = 5
+L_SHAPE = 6
+
+SHAPES = [LINE_SHAPE, T_SHAPE, SQUARE_SHAPE, INVERT_Z_SHAPE, Z_SHAPE, INVERT_L_SHAPE, L_SHAPE]
 
 class Block():
     def __init__(self,type):
@@ -381,6 +393,7 @@ class Tetris():
             self.speed=int(math.ceil(self.speed_mult*self.speed))
             self.cleared-=self.required
             self.required=int(math.ceil(self.required/self.speed_mult))
+
     def settle_block(self):
         if(not self.first_settle): return
         self.first_settle=False
