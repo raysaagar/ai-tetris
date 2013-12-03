@@ -1,3 +1,6 @@
+# Author: adhit
+# https://github.com/adhit/tetris/blob/master/tetris.py
+
 import os,sys
 import pygame
 import random
@@ -217,8 +220,7 @@ class Block():
 class Tetris():
     def __init__(self):
         pygame.init()
-        pygame.display.set_caption("Adhit's Tetris")
-        pygame.mixer.music.load("tetris.mid")
+        pygame.display.set_caption("Tetris")
         self.speed=2000
         self.level=0
         self.cleared=0
@@ -233,8 +235,6 @@ class Tetris():
             for j in range(10):
                 self.grid[i].append(None)   
         pygame.mixer.init()
-        pygame.mixer.music.set_volume(0.5)
-        pygame.mixer.music.play(-1)
         pygame.key.set_repeat(200,50)
         self.crnt=Block(random.randint(0,6))
         self.preview=[]
@@ -429,7 +429,6 @@ if __name__=='__main__':
                     keys=pygame.key.get_pressed()
                     if(keys[pygame.K_y]):
                         start=True
-                        pygame.mixer.music.stop()
                         break
                     if(keys[pygame.K_n]):
                         sys.exit()
