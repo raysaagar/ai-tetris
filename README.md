@@ -1,4 +1,6 @@
 ai-tetris
 =========
 
-CS 182 final project
+Prerequisites
+--------------
+Install pygame using the [binaries](http://www.pygame.org/install.html) for your platform.
