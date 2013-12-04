@@ -1,7 +1,7 @@
-Tetr*AI*s - AI Tetris
+Tetrais - AI Tetris
 ====================
 
-## Computer Science 182 Fall 2013
+## Computer Science 182 Final Project - Fall 2013
 
 ### Project Members: ###
 * Saagar Deshpande
