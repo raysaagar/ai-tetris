@@ -13,6 +13,8 @@ What you need to know:
     - print_grid for a beautiful ASCII representation of your configuration
 """
 
+debug = False
+
 GRID_HEIGHT = 20
 GRID_WIDTH = 10
 
@@ -21,7 +23,10 @@ def print_grid(grid, block=None):
     Print ASCII version of our tetris for debugging
     """
     for y in xrange(GRID_HEIGHT):
-        print "%2d" % y,
+        if debug: 
+            # Column numbers
+            print "%2d" % y,
+
         for x in xrange(GRID_WIDTH):
             block = grid[y][x]
             if block:
@@ -76,7 +81,8 @@ def get_num_holes(g):
         for j in range(len(grid[i])): # col
             if i - 1 >= 0 and grid[i][j] is None and grid[i-1][j] is not None:
                 holes.append((i, j))
-    print holes
+    if debug: 
+        print holes
     # for each find earlier keep digging down to see how many holes additionally there are
     for i, j in holes:
         while i + 1 < len(grid) and grid[i + 1][j] is None:
@@ -127,7 +133,7 @@ class TetrisSearchProblem(search.SearchProblem):
     def isGoalState(self, state):
         # TODO: Define this -- depends on what approach we want to take
         # Is it just if the state is ready to tetris and the next piece is a line piece?
-        return len(state["pieces"]) == 45
+        return len(state["pieces"]) == 30
 
     def _generateRotations(self, piece, grid):
         """
@@ -201,7 +207,6 @@ class TetrisSearchProblem(search.SearchProblem):
                 # Add the block to the grid
                 merge_grid_block(grid_copy, piece_copy)
 
-                # Register the piece into the grid
                 successors.append({
                     "board": grid_copy,
                     "pieces": state["pieces"][1:] 
@@ -232,7 +237,6 @@ def find_tetris(problem):
 
         for grid in game_replay:
             print_grid(grid)
-            print get_num_holes(grid)
             print
 
             sleep(1)

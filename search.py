@@ -99,11 +99,13 @@ def parameterizedSearch(problem, FrontierDataStructure, priorityFunction=None, h
     if problem.isGoalState(node):
       return (actionHistory + [node["board"]], node)
 
-    for successor in problem.getSuccessors(node):
-      action = node["board"]
-      if successor not in visited:
-        visited.append(successor)
-        frontier.push((successor, actionHistory + [action] if action else []))
+    # All we need is the single best successor
+    successors = problem.getSuccessors(node)
+    best_successor = max(successors, key=lambda x: heuristic(x, problem))
+    action = best_successor["board"]
+
+    visited.append(best_successor)
+    frontier.push((best_successor, actionHistory + [action] if action else []))
 
 def depthFirstSearch(problem):
   """
