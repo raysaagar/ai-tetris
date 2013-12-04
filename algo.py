@@ -75,20 +75,21 @@ def get_num_holes(g):
         int - number of holes
     """
     grid = copy.deepcopy(g)
-    holes = []
+    # use sets to avoid dups
+    holes = set()
     # first for loop finds initial underhangs
     for i in range(len(grid) - 1, 0, -1): # row
         for j in range(len(grid[i])): # col
             if i - 1 >= 0 and grid[i][j] is None and grid[i-1][j] is not None:
-                holes.append((i, j))
-    if debug: 
-        print holes
+                holes.add((i, j))
+    # new copy because can't change set while iterating.
+    all_holes = copy.deepcopy(holes)
     # for each find earlier keep digging down to see how many holes additionally there are
     for i, j in holes:
         while i + 1 < len(grid) and grid[i + 1][j] is None:
-            holes.append((i + 1, j))
+            all_holes.add((i + 1, j))
             i += 1
-    return len(holes)
+    return len(all_holes)
 
 
 """ gets best successor based on state score """
