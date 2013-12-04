@@ -2,7 +2,7 @@ import search
 import random
 import tetris
 import copy
-import platform
+from time import sleep
 
 
 """
@@ -21,6 +21,7 @@ def print_grid(grid, block=None):
     Print ASCII version of our tetris for debugging
     """
     for y in xrange(GRID_HEIGHT):
+        print "%2d" % y,
         for x in xrange(GRID_WIDTH):
             block = grid[y][x]
             if block:
@@ -71,14 +72,15 @@ def get_num_holes(g):
     grid = copy.deepcopy(g)
     holes = []
     # first for loop finds initial underhangs
-    for i in range(len(grid)-1, 0, -1): # row
+    for i in range(len(grid) - 1, 0, -1): # row
         for j in range(len(grid[i])): # col
-            if i-1 >= 0 and grid[i][j] is None and grid[i-1][j] is not None:
+            if i - 1 >= 0 and grid[i][j] is None and grid[i-1][j] is not None:
                 holes.append((i, j))
+    print holes
     # for each find earlier keep digging down to see how many holes additionally there are
     for i, j in holes:
-        while i+1 < len(grid) and grid[i+1][j] is None:
-            holes.append((i+1, j))
+        while i + 1 < len(grid) and grid[i + 1][j] is None:
+            holes.append((i + 1, j))
             i += 1
     return len(holes)
 
@@ -92,14 +94,17 @@ def getBestSuccessor(problem, state):
         print "Error"
         return None
     for s in successors:
-        temp = evaluateState(s['board'])
+        temp = evaluate_state(s['board'])
         if temp > cur_max:
             cur_best = s
             cur_max = temp
     return cur_best
 
-""" evaluates state based on some evaluation function """
-def evaluateState(grid):
+def evaluate_state(state, problem):
+    """
+    Heuristic / scoring function for state
+    """
+    grid = state["board"]
     return -(10*get_num_holes(grid) + get_height(grid))
 
 class TetrisSearchProblem(search.SearchProblem):
@@ -115,8 +120,8 @@ class TetrisSearchProblem(search.SearchProblem):
             for j in range(GRID_WIDTH):
                 self.initial_board[i].append(None)   
 
-
     def getStartState(self):
+        # Tuple of configuration and past grids
         return { "pieces": self.all_pieces, "board": self.initial_board }
 
     def isGoalState(self, state):
@@ -211,7 +216,29 @@ class TetrisSearchProblem(search.SearchProblem):
         pass
 
 def main():
-    example()
+    search_problem = TetrisSearchProblem()
+    find_tetris(search_problem)
+
+def find_tetris(problem):
+    """
+    Continues until we find a tetris
+    """
+    current_node = None
+
+    # Game loop: keep playing the game until all of the pieces are done
+    while current_node is None or len(current_node["pieces"]) > 0:
+        game_replay, goal_node = search.aStarSearch(problem, heuristic=evaluate_state)
+        current_node = goal_node
+
+        for grid in game_replay:
+            print_grid(grid)
+            print get_num_holes(grid)
+            print
+
+            sleep(1)
+
+        return # TODO: remove once we have a real goal state
+    
 
 def example():
     """

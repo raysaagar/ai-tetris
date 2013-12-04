@@ -66,16 +66,6 @@ class SearchProblem:
      util.raiseNotDefined()
            
 
-def tinyMazeSearch(problem):
-  """
-  Returns a sequence of moves that solves tinyMaze.  For any other
-  maze, the sequence of moves will be incorrect, so only use this for tinyMaze
-  """
-  from game import Directions
-  s = Directions.SOUTH
-  w = Directions.WEST
-  return  [s,s,w,s,w,w,s,w]
-
 def parameterizedSearch(problem, FrontierDataStructure, priorityFunction=None, heuristic=None):
   """
   Parameterized, generalized search problem
@@ -86,11 +76,12 @@ def parameterizedSearch(problem, FrontierDataStructure, priorityFunction=None, h
       heuristic: a heuristic function
       
   Returns:
-      The path to the goal state that was found by the search
+      The goal state and its path
   """
+  # TODO make sure the changes we made were correct...
+  # x[0] is the current state
   if heuristic:
-    # x[0] is the current node. x[2] is the cost it took to get to the node
-    priorityFunction = lambda x: heuristic(x[0], problem) + x[2]
+    priorityFunction = lambda x: heuristic(x[0], problem)
 
   if priorityFunction:
     frontier = FrontierDataStructure(priorityFunction)
@@ -99,23 +90,20 @@ def parameterizedSearch(problem, FrontierDataStructure, priorityFunction=None, h
 
   visited = []
   node = problem.getStartState()
-  frontier.push((node, None, 0, []))
+  frontier.push((node, []))
   visited.append(node)
 
   while not frontier.isEmpty():
-    # represent each step of search as a four-tuple
-    # actionHistory is a list of all actions up to but not including
-    # the current node
-    node, action, currentCost, actionHistory = frontier.pop()
+    node, actionHistory = frontier.pop()
 
     if problem.isGoalState(node):
-      return actionHistory + [action]
+      return (actionHistory + [node["board"]], node)
 
-    for (successor, nextAction, stepCost) in problem.getSuccessors(node):
+    for successor in problem.getSuccessors(node):
+      action = node["board"]
       if successor not in visited:
         visited.append(successor)
-        frontier.push((successor, nextAction, currentCost + stepCost, 
-          actionHistory + [action] if action else []))
+        frontier.push((successor, actionHistory + [action] if action else []))
 
 def depthFirstSearch(problem):
   """
