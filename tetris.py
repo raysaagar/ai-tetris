@@ -31,6 +31,45 @@ MID_X=WIDTH/2
 PREVIEW_POS=[(WIDTH+7*FULL_WIDTH,3*FULL_WIDTH),(WIDTH+12*FULL_WIDTH,3*FULL_WIDTH),(WIDTH+17*FULL_WIDTH,3*FULL_WIDTH)]
 SAVED_POS=(WIDTH+7*FULL_WIDTH,9*FULL_WIDTH)
 
+"""
+Added by Louis
+Pretty print tetris
+"""
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    OTHERGREEN = '\033[37m'
+    OTHERBLUE = '\033[34m'
+    SOME_COLOR = '\033[35m'
+    MORE_COLOR = '\033[36m'
+
+    OTHER = '\033[33m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+
+    def disable(self):
+        self.HEADER = ''
+        self.OKBLUE = ''
+        self.OKGREEN = ''
+        self.WARNING = ''
+        self.FAIL = ''
+        self.ENDC = ''
+
+# Map the RGB colors to terminal colors
+# Arbitrary assignments. Find more color codes if they conflict, I'm not sure
+# if colors are duplicated
+TERM_COLORS = {
+    RED: bcolors.OKBLUE,
+    ORANGE: bcolors.OKGREEN,
+    YELLOW: bcolors.WARNING,
+    GREEN: bcolors.OTHERGREEN,
+    BLUE: bcolors.OTHERBLUE,
+    CYAN: bcolors.FAIL,
+    PURPLE: bcolors.SOME_COLOR,
+    WHITE: bcolors.MORE_COLOR
+        }
 #pygame things
 clock=pygame.time.Clock()
 screen=pygame.display.set_mode((3*WIDTH,HEIGHT));
@@ -44,6 +83,14 @@ class Square():
         self.color=color
         self.x=pos[0]
         self.y=pos[1]
+
+    def __repr__(self):
+        """
+        Added by Louis. For printing ASCII squares
+        """
+
+        return TERM_COLORS[self.color] + "#" + bcolors.ENDC
+        
     def move_up(self):
         self.y=self.y-FULL_WIDTH
     def move_down(self):
@@ -156,10 +203,12 @@ class Block():
             self.squares.append(Square(self.color,(self.x+FULL_WIDTH,self.y)))
             self.squares.append(Square(self.color,(self.x+FULL_WIDTH,self.y-FULL_WIDTH)))
     def move_up(self,grid):
-        if(not self.can_move(0,-1,grid)): return
+        if(not self.can_move(0,-1,grid)): return False
         self.y-=FULL_WIDTH
         for square in self.squares:
             square.move_up()
+        return True
+
     def move_down(self,grid):
         if(not self.can_move(0,1,grid)): return False
         self.y+=FULL_WIDTH
@@ -167,15 +216,19 @@ class Block():
             square.move_down()
         return True
     def move_left(self,grid):
-        if(not self.can_move(-1,0,grid)): return
+        if(not self.can_move(-1,0,grid)): return False
         self.x-=FULL_WIDTH
         for square in self.squares:
             square.move_left()
+        return True
+
     def move_right(self,grid):
-        if(not self.can_move(1,0,grid)): return
+        if(not self.can_move(1,0,grid)): return False
         self.x+=FULL_WIDTH
         for square in self.squares:
             square.move_right()
+        return True
+
     def draw(self):
         for square in self.squares:
             square.draw()
@@ -395,6 +448,14 @@ class Tetris():
             self.required=int(math.ceil(self.required/self.speed_mult))
 
     def settle_block(self):
+        """ 
+        Notes by Louis
+        See merge_grid_block in algo.py
+
+        This has side-effects, so I've redefined another function 
+        merge_grid_block
+        """
+
         if(not self.first_settle): return
         self.first_settle=False
         for square in self.crnt.squares:
