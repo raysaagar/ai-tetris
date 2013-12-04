@@ -187,6 +187,7 @@ class TetrisSearchProblem(search.SearchProblem):
         # Because we're leveraging tetris.py, we have a lot of 
         # side-effecting code going on -- have to be careful
 
+
         possible_rotations = self._generateRotations(new_piece, grid)
 
         # Starting from the left-hand side this moves the 
