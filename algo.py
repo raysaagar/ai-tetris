@@ -86,6 +86,26 @@ def get_num_holes(g):
             i += 1
     return len(holes)
 
+
+""" gets best successor based on state score """
+def getBestSuccessor(problem, state):
+    successors = problem.getSuccessors(state)
+    cur_max = float("-inf")
+    cur_best = None
+    if len(successors) == 0:
+        print "Error"
+        return None
+    for s in successors:
+        temp = evaluateState(s['board'])
+        if temp > cur_max:
+            cur_best = s
+            cur_max = temp
+    return cur_best
+
+""" evaluates state based on some evaluation function """
+def evaluateState(grid):
+    return -(10*get_num_holes(grid) + get_height(grid))
+
 class TetrisSearchProblem(search.SearchProblem):
     def __init__(self):
         # Generate random sequence of pieces for offline tetris
@@ -216,7 +236,12 @@ def example():
         print_grid(s["board"])
         print
 
-    print_grid(more_succ[2]["board"])
-    get_num_holes(more_succ[2]["board"])
+    print "*******************brandon and saagar's testing*******************"
+    print "next piece:"
+    print more_succ[0]['pieces'][0]
+    print_grid(more_succ[0]["board"])
+    print
+    print_grid(getBestSuccessor(search_problem, more_succ[0])['board'])
+    
 if __name__ == '__main__':
     main()
