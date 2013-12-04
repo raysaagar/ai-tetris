@@ -15,12 +15,9 @@ CS182 Problem Set 1
 We also collaborated with Saagar Deshpande.
 """
 
-"""
-In search.py, you will implement generic search algorithms which are called 
-by Pacman agents (in searchAgents.py).
-"""
-
 import util
+import copy
+import tetris
 
 class SearchProblem:
   """
@@ -104,8 +101,17 @@ def parameterizedSearch(problem, FrontierDataStructure, priorityFunction=None, h
     best_successor = max(successors, key=lambda x: heuristic(x, problem))
     action = best_successor["board"]
 
+    # We want the replay to show the pieces before AND after the lines are cleared.
+    # Then we want to modify the best successor to have cleared lines
+    action_copy = copy.deepcopy(action)
+    if clear_lines(action_copy):
+        new_history = actionHistory + [action] + [action_copy]
+    else:
+        new_history = actionHistory + [action]
+    
+    best_successor["board"] = action_copy
     visited.append(best_successor)
-    frontier.push((best_successor, actionHistory + [action] if action else []))
+    frontier.push((best_successor, new_history if action else []))
 
 def depthFirstSearch(problem):
   """
@@ -147,7 +153,55 @@ def aStarSearch(problem, heuristic=nullHeuristic):
   "*** YOUR CODE HERE ***"
   return parameterizedSearch(problem, util.PriorityQueueWithFunction, None, heuristic)
 
-    
+def clear_lines(grid):
+  """
+  Clear lines from a grid. Mutates grid.
+  
+  Taken from tetris.py, Tetris.clear_lines()
+  
+  Returns:
+      True if more than 0 lines were cleared. False otherwise
+  """
+  count=0
+  for i in range(20):
+      full=True
+      for j in range(10):
+          if(grid[i][j] is None): 
+              full=False
+              break
+      if(full):
+          count+=1
+          for j in range(10):
+              grid[i][j]=None
+  i=19
+  j=18
+  while(i>0 and j>=0):
+      null=True
+      for k in range(10):
+          if(grid[i][k] is not None):
+              null=False
+              break
+      if(null):
+          j=min(i-1,j)
+          while(j>=0 and null):
+              null=True
+              for k in range(10):
+                  if(grid[j][k] is not None):
+                      null=False
+                      break
+              if(null): j-=1
+          if(j<0): break
+          for k in range(10):
+              grid[i][k]=grid[j][k]
+              grid[j][k]=None
+              if(grid[i][k] is not None): grid[i][k].y=tetris.HALF_WIDTH+i*tetris.FULL_WIDTH
+          j-=1
+      i-=1
+  
+  if (count > 0):
+      return True
+  else:
+      return False
   
 # Abbreviations
 bfs = breadthFirstSearch

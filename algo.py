@@ -169,6 +169,7 @@ class TetrisSearchProblem(search.SearchProblem):
 
         return rotated_pieces
 
+
     def getSuccessors(self, state):
         """
         Return a list of successor nodes
@@ -205,7 +206,7 @@ class TetrisSearchProblem(search.SearchProblem):
                 # Move the piece all the way down
                 while piece_copy.move_down(grid_copy): pass
 
-                # Add the block to the grid
+                # Add the block to the grid and clear lines
                 merge_grid_block(grid_copy, piece_copy)
 
                 successors.append({
