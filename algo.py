@@ -14,6 +14,7 @@ What you need to know:
 """
 
 debug = False
+demo = True
 
 GRID_HEIGHT = 20
 GRID_WIDTH = 10
@@ -120,6 +121,13 @@ class TetrisSearchProblem(search.SearchProblem):
         NUM_PIECES = 50
         self.all_pieces = [random.choice(tetris.SHAPES) for i in xrange(NUM_PIECES)]
 
+        if demo:
+            self.all_pieces = [tetris.LINE_SHAPE, tetris.SQUARE_SHAPE, tetris.SQUARE_SHAPE,
+                 tetris.T_SHAPE, tetris.Z_SHAPE, tetris.L_SHAPE, tetris.LINE_SHAPE,
+                 tetris.T_SHAPE, tetris.T_SHAPE] + \
+                [tetris.LINE_SHAPE, tetris.SQUARE_SHAPE, tetris.INVERT_L_SHAPE, tetris.LINE_SHAPE, tetris.LINE_SHAPE] + \
+                [random.choice(tetris.SHAPES) for i in xrange(30)] 
+
         # Taken from tetris.py: initial board setup
         self.initial_board = []  
         for i in range(GRID_HEIGHT):
@@ -134,7 +142,7 @@ class TetrisSearchProblem(search.SearchProblem):
     def isGoalState(self, state):
         # TODO: Define this -- depends on what approach we want to take
         # Is it just if the state is ready to tetris and the next piece is a line piece?
-        return len(state["pieces"]) == 30
+        return len(state["pieces"]) == 20
 
     def _generateRotations(self, piece, grid):
         """
