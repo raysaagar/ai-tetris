@@ -3,7 +3,6 @@
 # Modified version removes music
 
 import os,sys
-import pygame
 import random
 import math
 
