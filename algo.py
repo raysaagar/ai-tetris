@@ -4,10 +4,6 @@ import tetris
 import copy
 import platform
 
-# fix for windows
-if platform.system() == "Windows":
-    from colorama import init
-    init()
 
 """
 What you need to know:

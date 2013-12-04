@@ -7,6 +7,9 @@ import pygame
 import random
 import math
 
+from colorama import init, Fore
+init()
+
 #define colors
 RED=255,0,64
 ORANGE=255,64,0
@@ -35,41 +38,21 @@ SAVED_POS=(WIDTH+7*FULL_WIDTH,9*FULL_WIDTH)
 Added by Louis
 Pretty print tetris
 """
-class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    OTHERGREEN = '\033[37m'
-    OTHERBLUE = '\033[34m'
-    SOME_COLOR = '\033[35m'
-    MORE_COLOR = '\033[36m'
-
-    OTHER = '\033[33m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-
-    def disable(self):
-        self.HEADER = ''
-        self.OKBLUE = ''
-        self.OKGREEN = ''
-        self.WARNING = ''
-        self.FAIL = ''
-        self.ENDC = ''
 
 # Map the RGB colors to terminal colors
 # Arbitrary assignments. Find more color codes if they conflict, I'm not sure
 # if colors are duplicated
 TERM_COLORS = {
-    RED: bcolors.OKBLUE,
-    ORANGE: bcolors.OKGREEN,
-    YELLOW: bcolors.WARNING,
-    GREEN: bcolors.OTHERGREEN,
-    BLUE: bcolors.OTHERBLUE,
-    CYAN: bcolors.FAIL,
-    PURPLE: bcolors.SOME_COLOR,
-    WHITE: bcolors.MORE_COLOR
+    RED: Fore.RED,
+    ORANGE: Fore.MAGENTA,
+    YELLOW: Fore.YELLOW,
+    GREEN: Fore.GREEN,
+    BLUE: Fore.BLUE,
+    CYAN: Fore.CYAN,
+    PURPLE: Fore.BLUE,
+    WHITE: Fore.WHITE
         }
+
 #pygame things
 clock=pygame.time.Clock()
 screen=pygame.display.set_mode((3*WIDTH,HEIGHT));
@@ -89,7 +72,7 @@ class Square():
         Added by Louis. For printing ASCII squares
         """
 
-        return TERM_COLORS[self.color] + "#" + bcolors.ENDC
+        return TERM_COLORS[self.color] + "#" + Fore.RESET
         
     def move_up(self):
         self.y=self.y-FULL_WIDTH
