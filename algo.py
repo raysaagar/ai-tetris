@@ -54,6 +54,38 @@ def merge_grid_block(grid, block):
             grid[y][x]=square
     return
 
+def get_height(grid):
+    """
+    Given a grid, calculates the maximum height of any column
+    Returns:
+        int representing the maximum height of any column
+    """
+    heights = []
+    for index in range(GRID_WIDTH):
+        temp = [i for i, x in enumerate([col[index] for col in grid][::-1]) if x != None]
+        heights.append(0 if len(temp) == 0 else max(temp)+1) # 0-indexed lol
+    return max(heights)
+
+def get_num_holes(g):
+    """
+    Given a grid, calculates the number of ''holes'' in the placed pieces
+    Returns:
+        int - number of holes
+    """
+    grid = copy.deepcopy(g)
+    holes = []
+    # first for loop finds initial underhangs
+    for i in range(len(grid)-1, 0, -1): # row
+        for j in range(len(grid[i])): # col
+            if i-1 >= 0 and grid[i][j] is None and grid[i-1][j] is not None:
+                holes.append((i, j))
+    # for each find earlier keep digging down to see how many holes additionally there are
+    for i, j in holes:
+        while i+1 < len(grid) and grid[i+1][j] is None:
+            holes.append((i+1, j))
+            i += 1
+    return len(holes)
+
 class TetrisSearchProblem(search.SearchProblem):
     def __init__(self):
         # Generate random sequence of pieces for offline tetris
@@ -184,5 +216,7 @@ def example():
         print_grid(s["board"])
         print
 
+    print_grid(more_succ[2]["board"])
+    get_num_holes(more_succ[2]["board"])
 if __name__ == '__main__':
     main()
