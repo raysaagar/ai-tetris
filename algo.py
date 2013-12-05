@@ -92,6 +92,20 @@ def get_num_holes(g):
             i += 1
     return len(all_holes)
 
+def get_lines_cleared(gnew, gold):
+    diff_lines = get_height(gnew) - get_height(gold)
+    if diff_lines > -4:
+        return -100 # strongly prefer clearing 4 at a time
+    else:
+        return 0
+    return
+
+def average_height(grid):
+    heights = []
+    for index in range(GRID_WIDTH):
+        temp = [i for i, x in enumerate([col[index] for col in grid][::-1]) if x != None]
+        heights.append(0 if len(temp) == 0 else max(temp)+1) # 0-indexed lol
+    return float(sum(heights)) / GRID_WIDTH
 
 """ gets best successor based on state score """
 def getBestSuccessor(problem, state):
@@ -113,7 +127,7 @@ def evaluate_state(state, problem):
     Heuristic / scoring function for state
     """
     grid = state["board"]
-    return -(10*get_num_holes(grid) + get_height(grid))
+    return -(10*get_num_holes(grid) + get_height(grid) + average_height(grid))
 
 class TetrisSearchProblem(search.SearchProblem):
     def __init__(self):
