@@ -96,10 +96,19 @@ def parameterizedSearch(problem, FrontierDataStructure, priorityFunction=None, h
     if problem.isGoalState(node):
       return (actionHistory + [node["board"]], node)
 
-    # All we need is the single best successor
+    
     successors = problem.getSuccessors(node)
+
+    # if no successors, game over
+    if len(successors) == 0:
+      print "Game Over"
+      return (actionHistory + [node["board"]], node)
+
+    # All we need is the single best successor
     best_successor = max(successors, key=lambda x: heuristic(x, problem))
     action = best_successor["board"]
+
+ 
 
     # We want the replay to show the pieces before AND after the lines are cleared.
     # Then we want to modify the best successor to have cleared lines

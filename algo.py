@@ -2,6 +2,7 @@ import search
 import random
 import tetris
 import copy
+import sys
 from time import sleep
 
 
@@ -14,7 +15,8 @@ What you need to know:
 """
 
 debug = False
-demo = True
+demo = False
+TESTMODE = True
 
 GRID_HEIGHT = 20
 GRID_WIDTH = 10
@@ -52,6 +54,7 @@ def merge_grid_block(grid, block):
     for square in block.squares:
         y, x = square.y / tetris.FULL_WIDTH, square.x / tetris.FULL_WIDTH
         if grid[y][x]:
+            print get_height(grid)
             raise Exception("Tried to put a Tetris block where another piece already exists")
         else:
             grid[y][x]=square
@@ -132,7 +135,7 @@ def evaluate_state(state, problem):
 class TetrisSearchProblem(search.SearchProblem):
     def __init__(self):
         # Generate random sequence of pieces for offline tetris
-        NUM_PIECES = 50
+        NUM_PIECES = 10
         self.all_pieces = [random.choice(tetris.SHAPES) for i in xrange(NUM_PIECES)]
 
         if demo:
@@ -229,12 +232,20 @@ class TetrisSearchProblem(search.SearchProblem):
                 while piece_copy.move_down(grid_copy): pass
 
                 # Add the block to the grid and clear lines
-                merge_grid_block(grid_copy, piece_copy)
+                # filter out a successor that makes a game ending move
+                try:
+                    merge_grid_block(grid_copy, piece_copy)
 
-                successors.append({
-                    "board": grid_copy,
-                    "pieces": state["pieces"][1:] 
-                })
+                    #  push a new random piece to replace the one we played
+                    piece = random.choice(tetris.SHAPES)
+                    state["pieces"].append(piece)
+
+                    successors.append({
+                        "board": grid_copy,
+                        "pieces": state["pieces"][1:] 
+                    })
+                except:
+                    print "failed move!"
 
                 # Try the next configuration
                 can_move_right = rotated_piece.move_right(grid)  # has side-effects
@@ -246,7 +257,45 @@ class TetrisSearchProblem(search.SearchProblem):
 
 def main():
     search_problem = TetrisSearchProblem()
-    find_tetris(search_problem)
+    if TESTMODE:
+        test_tetris(3)
+    else:
+        find_tetris(search_problem)
+
+
+def test_tetris(ntrial=10, heuristic=evaluate_state):
+    """
+    Test harness
+    """
+
+    total_lines = 0
+    for i in range(ntrial):
+        problem = TetrisSearchProblem()
+
+        current_node = None
+
+        # 1) detect when it touches the top
+        # 2) make game go on infinitely
+        
+        # Game loop: keep playing the game until all of the pieces are done
+        while current_node is None or len(current_node["pieces"]) > 0:
+            game_replay, goal_node = search.aStarSearch(problem, heuristic)
+            current_node = goal_node
+
+            lines_cleared = 0
+            for i in range(len(game_replay)-1):
+                before = get_height(game_replay[i])
+                after = get_height(game_replay[i+1])
+                if after < before:
+                    lines_cleared += before - after
+
+            print "Lines cleared: " + str(lines_cleared)
+            break
+            #return # TODO: remove once we have a real goal state
+
+        total_lines += lines_cleared
+
+    print "Total Lines: " + str(total_lines) + " in " + str(ntrial) + " games."
 
 def find_tetris(problem):
     """
@@ -267,6 +316,7 @@ def find_tetris(problem):
 
         return # TODO: remove once we have a real goal state
     
+
 
 def example():
     """
