@@ -93,8 +93,10 @@ def parameterizedSearch(problem, FrontierDataStructure, priorityFunction=None, h
   while not frontier.isEmpty():
     node, actionHistory = frontier.pop()
 
-    if problem.isGoalState(node):
-      return (actionHistory + [node["board"]], node)
+    # this is bad
+    #if problem.isGoalState(node):
+    #  print "HERE"
+    #  return (actionHistory + [node["board"]], node)
 
     
     successors = problem.getSuccessors(node)
@@ -104,21 +106,45 @@ def parameterizedSearch(problem, FrontierDataStructure, priorityFunction=None, h
       print "Game Over"
       return (actionHistory + [node["board"]], node)
 
-    # All we need is the single best successor
-    best_successor = max(successors, key=lambda x: heuristic(x, problem))
+
+    # generates real successors, with lines cleared
+    real_successors = []
+    for s in successors:
+      grid_copy = copy.deepcopy(s["board"])
+      clear_lines(grid_copy)
+      real_successors.append({
+        "board": grid_copy,
+        "pieces": s["pieces"]
+      })
+
+
+    # All we need is the single best successor (out of the real successors)
+    best_successor = max(real_successors, key=lambda x: heuristic(x, problem))
+    best_index = real_successors.index(best_successor)
+    old_action = successors[best_index]["board"]
     action = best_successor["board"]
 
- 
-
-    # We want the replay to show the pieces before AND after the lines are cleared.
-    # Then we want to modify the best successor to have cleared lines
-    action_copy = copy.deepcopy(action)
-    if clear_lines(action_copy):
-        new_history = actionHistory + [action] + [action_copy]
-    else:
-        new_history = actionHistory + [action]
+    # # We want the replay to show the pieces before AND after the lines are cleared.
+    # # Then we want to modify the best successor to have cleared lines
+    # action_copy = copy.deepcopy(action)
+    # if clear_lines(action_copy):
+    #     new_history = actionHistory + [action] + [action_copy]
+    # else:
+    #     new_history = actionHistory + [action]
     
-    best_successor["board"] = action_copy
+    # best_successor["board"] = action_copy
+
+    
+    # have to check string equality for some reason due to weird ascii things
+    # list equality always returns false
+    if str(old_action) == str(action):
+      # no lines were cleared
+      newActionList = [action]
+    # else push the uncleared version, then cleared one for display purposes
+    else:
+      newActionList = [old_action] + [action]
+
+    new_history = actionHistory + newActionList
     visited.append(best_successor)
     frontier.push((best_successor, new_history if action else []))
 

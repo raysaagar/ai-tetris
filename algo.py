@@ -4,6 +4,7 @@ import tetris
 import copy
 import sys
 from time import sleep
+import string
 
 
 """
@@ -54,7 +55,7 @@ def merge_grid_block(grid, block):
     for square in block.squares:
         y, x = square.y / tetris.FULL_WIDTH, square.x / tetris.FULL_WIDTH
         if grid[y][x]:
-            print get_height(grid)
+            #print get_height(grid)
             raise Exception("Tried to put a Tetris block where another piece already exists")
         else:
             grid[y][x]=square
@@ -109,21 +110,6 @@ def average_height(grid):
         temp = [i for i, x in enumerate([col[index] for col in grid][::-1]) if x != None]
         heights.append(0 if len(temp) == 0 else max(temp)+1) # 0-indexed lol
     return float(sum(heights)) / GRID_WIDTH
-
-""" gets best successor based on state score """
-def getBestSuccessor(problem, state):
-    successors = problem.getSuccessors(state)
-    cur_max = float("-inf")
-    cur_best = None
-    if len(successors) == 0:
-        print "Error"
-        return None
-    for s in successors:
-        temp = evaluate_state(s['board'])
-        if temp > cur_max:
-            cur_best = s
-            cur_max = temp
-    return cur_best
 
 def evaluate_state(state, problem):
     """
@@ -245,7 +231,8 @@ class TetrisSearchProblem(search.SearchProblem):
                         "pieces": state["pieces"][1:] 
                     })
                 except:
-                    print "failed move!"
+                    pass
+                    #print "failed move!"
 
                 # Try the next configuration
                 can_move_right = rotated_piece.move_right(grid)  # has side-effects
@@ -254,48 +241,6 @@ class TetrisSearchProblem(search.SearchProblem):
 
     def getCostOfActions(self, actions):
         pass
-
-def main():
-    search_problem = TetrisSearchProblem()
-    if TESTMODE:
-        test_tetris(3)
-    else:
-        find_tetris(search_problem)
-
-
-def test_tetris(ntrial=10, heuristic=evaluate_state):
-    """
-    Test harness
-    """
-
-    total_lines = 0
-    for i in range(ntrial):
-        problem = TetrisSearchProblem()
-
-        current_node = None
-
-        # 1) detect when it touches the top
-        # 2) make game go on infinitely
-        
-        # Game loop: keep playing the game until all of the pieces are done
-        while current_node is None or len(current_node["pieces"]) > 0:
-            game_replay, goal_node = search.aStarSearch(problem, heuristic)
-            current_node = goal_node
-
-            lines_cleared = 0
-            for i in range(len(game_replay)-1):
-                before = get_height(game_replay[i])
-                after = get_height(game_replay[i+1])
-                if after < before:
-                    lines_cleared += before - after
-
-            print "Lines cleared: " + str(lines_cleared)
-            break
-            #return # TODO: remove once we have a real goal state
-
-        total_lines += lines_cleared
-
-    print "Total Lines: " + str(total_lines) + " in " + str(ntrial) + " games."
 
 def find_tetris(problem):
     """
@@ -313,36 +258,72 @@ def find_tetris(problem):
             print
 
             sleep(1)
-
         return # TODO: remove once we have a real goal state
-    
 
+def test_tetris(ntrial=10, heuristic=evaluate_state, watchGames=False):
+    """
+    Test harness
+    """
 
-def example():
-    """
-    Saagar, Brandon: call this function and you'll get a concrete idea of how
-    the next configurations are being generated
-    """
+    total_lines = []
+    for i in range(ntrial):
+        problem = TetrisSearchProblem()
+
+        current_node = None
+        
+        # Game loop: keep playing the game until all of the pieces are done
+        while current_node is None or len(current_node["pieces"]) > 0:
+            game_replay, goal_node = search.aStarSearch(problem, heuristic)
+            current_node = goal_node
+            #print current_node
+
+            if watchGames:
+                for grid in game_replay:
+                    print_grid(grid)
+                    sleep(0.2)
+                sleep(2)
+
+            lines_cleared = 0
+            for j in range(len(game_replay)-1):
+                before = get_height(game_replay[j])
+                after = get_height(game_replay[j+1])
+                if after < before:
+                    lines_cleared += before - after
+
+            print "Lines cleared: " + str(lines_cleared)
+
+            with open('gameLogs/trial_2'+str(i)+'_linesCleared='+str(lines_cleared)+'.txt', 'w') as fout:
+                for g in game_replay:
+                    fout.write(str(g))
+                    fout.write('\n')
+            break
+            #return # TODO: remove once we have a real goal state
+
+        total_lines.append(lines_cleared)
+
+    print "Total Lines: " + str(total_lines) + " in " + str(ntrial) + " games."
+
+def main():
     search_problem = TetrisSearchProblem()
+    if TESTMODE:
+        test_tetris(10, watchGames=False)
+    else:
+        find_tetris(search_problem)
 
-    start = search_problem.getStartState()
-    succ = search_problem.getSuccessors(start)
-    for s in succ:
-        print_grid(s["board"])
-        print
+def watchReplay(filename):
+    with open(filename) as f:
+        for line in f:
+            parsed = string.replace(line, ',', '')
+            parsed = string.replace(parsed, 'None', '.')
+            parsed = string.lstrip(parsed, '[[')
+            parsed = string.rstrip(parsed, ']]\n')
+            
+            parselist = string.split(parsed, '] [')
+            for p in parselist:
+                print p
+            sleep(0.5)
 
-    print "Now, let's look at the successors for just one of these states"
-    more_succ = search_problem.getSuccessors(succ[0])
-    for s in more_succ:
-        print_grid(s["board"])
-        print
-
-    print "*******************brandon and saagar's testing*******************"
-    print "next piece:"
-    print more_succ[0]['pieces'][0]
-    print_grid(more_succ[0]["board"])
-    print
-    print_grid(getBestSuccessor(search_problem, more_succ[0])['board'])
-    
 if __name__ == '__main__':
-    main()
+    #main()
+    watchReplay('gameLogs/trial8_linesCleared=53.txt')
+
