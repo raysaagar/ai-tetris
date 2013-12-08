@@ -124,17 +124,6 @@ def parameterizedSearch(problem, FrontierDataStructure, priorityFunction=None, h
     old_action = successors[best_index]["board"]
     action = best_successor["board"]
 
-    # # We want the replay to show the pieces before AND after the lines are cleared.
-    # # Then we want to modify the best successor to have cleared lines
-    # action_copy = copy.deepcopy(action)
-    # if clear_lines(action_copy):
-    #     new_history = actionHistory + [action] + [action_copy]
-    # else:
-    #     new_history = actionHistory + [action]
-    
-    # best_successor["board"] = action_copy
-
-    
     # have to check string equality for some reason due to weird ascii things
     # list equality always returns false
     if str(old_action) == str(action):
