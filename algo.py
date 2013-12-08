@@ -38,6 +38,7 @@ def print_grid(grid, block=None):
             else:
                 print ".",
         print  # Newline at the end of a row
+    print
 
 def merge_grid_block(grid, block):
     """
@@ -120,6 +121,11 @@ def evaluate_state(state, problem):
 
 class TetrisSearchProblem(search.SearchProblem):
     def __init__(self):
+        # Number of pieces for which we want to look ahead for
+        # `1` meaning we look only at the next piece
+        # `2` meaning we base it off the next two pieces, and so on
+        self.lookahead = 2
+
         # Generate random sequence of pieces for offline tetris
         NUM_PIECES = 10
         self.all_pieces = [random.choice(tetris.SHAPES) for i in xrange(NUM_PIECES)]
@@ -145,7 +151,7 @@ class TetrisSearchProblem(search.SearchProblem):
     def isGoalState(self, state):
         # TODO: Define this -- depends on what approach we want to take
         # Is it just if the state is ready to tetris and the next piece is a line piece?
-        return len(state["pieces"]) == 20
+        return len(state["pieces"]) == 5
 
     def _generateRotations(self, piece, grid):
         """
@@ -274,6 +280,7 @@ def test_tetris(ntrial=10, heuristic=evaluate_state, watchGames=False):
         # Game loop: keep playing the game until all of the pieces are done
         while current_node is None or len(current_node["pieces"]) > 0:
             game_replay, goal_node = search.aStarSearch(problem, heuristic)
+            print "foo"
             current_node = goal_node
             #print current_node
 
@@ -306,7 +313,7 @@ def test_tetris(ntrial=10, heuristic=evaluate_state, watchGames=False):
 def main():
     search_problem = TetrisSearchProblem()
     if TESTMODE:
-        test_tetris(10, watchGames=False)
+        test_tetris(10, watchGames=True)
     else:
         find_tetris(search_problem)
 
@@ -324,6 +331,6 @@ def watchReplay(filename):
             sleep(0.5)
 
 if __name__ == '__main__':
-    #main()
-    watchReplay('gameLogs/trial8_linesCleared=53.txt')
+    main()
+    # watchReplay('gameLogs/trial8_linesCleared=53.txt')
 

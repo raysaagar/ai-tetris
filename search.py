@@ -108,21 +108,57 @@ def parameterizedSearch(problem, FrontierDataStructure, priorityFunction=None, h
 
 
     # generates real successors, with lines cleared
-    real_successors = []
+    immediate_successors = []
     for s in successors:
       grid_copy = copy.deepcopy(s["board"])
       clear_lines(grid_copy)
-      real_successors.append({
+      immediate_successors.append({
         "board": grid_copy,
         "pieces": s["pieces"]
       })
 
 
-    # All we need is the single best successor (out of the real successors)
-    best_successor = max(real_successors, key=lambda x: heuristic(x, problem))
-    best_index = real_successors.index(best_successor)
+    # Evaluated successors may not be the immediate successors
+    # if the lookahead is more than 1
+    # We use problem.lookahead - 1, subtracting 1 for the fact
+    # that we already generated the immediate successors
+
+    lookahead = problem.lookahead - 1
+
+    # We're going to keep track of the best successor
+    # corresponding to a successor state by encoding them in a pair of
+    # (successor, corresponding immediate successor)
+    prev_successor_layer = [(x, x) for x in immediate_successors]
+
+    # In the case when lookahead = 1, then notice that we'll never
+    # enter the while loop, so we evaluate the immediate layer
+    evaluated_successors = [(x, x) for x in immediate_successors]
+    while lookahead > 0:
+        # Notice how the new successors inherit the corresponding immediate successor
+        new_successor_layer = \
+            reduce(lambda acc, pair: acc + [(succ, pair[1]) for succ in problem.getSuccessors(pair[0])],
+                    prev_successor_layer, [])
+        
+        # Make the very last layer the ones that we'll evaluate
+        if lookahead == 1:
+            evaluated_successors = new_successor_layer
+        else:
+            prev_successor_layer = new_successor_layer
+
+        lookahead -= 1
+
+    best_successor_pair = max(evaluated_successors, key=lambda p: heuristic(p[0], problem))
+
+    best_successor = best_successor_pair[1]
+    best_index = immediate_successors.index(best_successor)
     old_action = successors[best_index]["board"]
     action = best_successor["board"]
+
+    # TODO: Remove
+    # If you want to see how lookahead is working, do this...
+    # but there's something else making it super slow
+    # import algo
+    # algo.print_grid ( action )
 
     # have to check string equality for some reason due to weird ascii things
     # list equality always returns false
