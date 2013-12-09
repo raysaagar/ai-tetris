@@ -331,6 +331,6 @@ def watchReplay(filename):
             sleep(0.5)
 
 if __name__ == '__main__':
-    main()
-    # watchReplay('gameLogs/trial8_linesCleared=53.txt')
+    #main()
+    watchReplay('gameLogs/trial8_linesCleared=53.txt')
 
