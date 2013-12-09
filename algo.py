@@ -120,11 +120,11 @@ def evaluate_state(state, problem):
     return -(10*get_num_holes(grid) + get_height(grid) + average_height(grid))
 
 class TetrisSearchProblem(search.SearchProblem):
-    def __init__(self):
+    def __init__(self, lookahead=1):
         # Number of pieces for which we want to look ahead for
         # `1` meaning we look only at the next piece
         # `2` meaning we base it off the next two pieces, and so on
-        self.lookahead = 2
+        self.lookahead = lookahead
 
         # Generate random sequence of pieces for offline tetris
         NUM_PIECES = 10
@@ -273,7 +273,7 @@ def test_tetris(ntrial=10, heuristic=evaluate_state, watchGames=False):
 
     total_lines = []
     for i in range(ntrial):
-        problem = TetrisSearchProblem()
+        problem = TetrisSearchProblem(lookahead=1)
 
         current_node = None
         
@@ -313,7 +313,7 @@ def test_tetris(ntrial=10, heuristic=evaluate_state, watchGames=False):
 def main():
     search_problem = TetrisSearchProblem()
     if TESTMODE:
-        test_tetris(10, watchGames=True)
+        test_tetris(10, watchGames=False)
     else:
         find_tetris(search_problem)
 
@@ -331,6 +331,6 @@ def watchReplay(filename):
             sleep(0.5)
 
 if __name__ == '__main__':
-    #main()
-    watchReplay('gameLogs/trial8_linesCleared=53.txt')
+    main()
+    #watchReplay('gameLogs/trial8_linesCleared=53.txt')
 
