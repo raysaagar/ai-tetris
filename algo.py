@@ -5,7 +5,7 @@ import copy
 import sys
 from time import sleep
 import string
-
+import math
 
 """
 What you need to know:
@@ -62,17 +62,47 @@ def merge_grid_block(grid, block):
             grid[y][x]=square
     return
 
-def get_height(grid):
-    """
-    Given a grid, calculates the maximum height of any column
-    Returns:
-        int representing the maximum height of any column
-    """
+""" CALL THIS BEFORE GET HEIGHT OR AVERAGE HEIGHT OR ETC """
+def get_height_list(grid):
     heights = []
     for index in range(GRID_WIDTH):
         temp = [i for i, x in enumerate([col[index] for col in grid][::-1]) if x != None]
-        heights.append(0 if len(temp) == 0 else max(temp)+1) # 0-indexed lol
+        heights.append(0 if len(temp) == 0 else max(temp)+1) # 0-indexed lol  
+    return heights
+
+def get_height(heights):
+    """
+    Given a list of heights, calculates the maximum height of any column
+    Returns:
+        int representing the maximum height of any column
+    """
     return max(heights)
+
+def average_height(heights):
+    return float(sum(heights)) / GRID_WIDTH
+
+
+"""bumpiness: sum of absolute height differences between neighboring columns"""
+def bumpiness(heights):
+    bumpiness = [heights[i+1]-heights[i] for i in range(0, GRID_WIDTH-1)]
+    return sum([abs(b) for b in bumpiness])
+
+def valleys(grid, heights):
+    valleys = 0
+    for i in range(2, GRID_HEIGHT):
+        for j in range(GRID_WIDTH):
+            if grid[i][j] is None and grid[i-1][j] is None and grid[i-2][j] is None:
+                if j == 0:
+                    if heights[j+1] >= heights[j] + 3:
+                        valleys += 1
+
+                elif j == GRID_WIDTH-1:
+                    if heights[j-1] >= heights[j] + 3:
+                        valleys += 1
+                else:
+                    if heights[j-1] >= heights[j] + 3 and heights[j+1] >= heights[j] + 3:
+                        valleys += 1
+    return valleys
 
 def get_num_holes(g):
     """
@@ -105,19 +135,16 @@ def get_lines_cleared(gnew, gold):
         return 0
     return
 
-def average_height(grid):
-    heights = []
-    for index in range(GRID_WIDTH):
-        temp = [i for i, x in enumerate([col[index] for col in grid][::-1]) if x != None]
-        heights.append(0 if len(temp) == 0 else max(temp)+1) # 0-indexed lol
-    return float(sum(heights)) / GRID_WIDTH
-
+""" EVALUATION FUNCTION """
 def evaluate_state(state, problem):
     """
     Heuristic / scoring function for state
     """
     grid = state["board"]
-    return -(10*get_num_holes(grid) + get_height(grid) + average_height(grid))
+    heights = get_height_list(grid)
+    #return -(10*get_num_holes(grid) + 2**(get_height(heights)) + bumpiness(heights) + average_height(heights))
+    return -1.0/1000*(72*get_height(heights) + 75*average_height(heights) + 442*get_num_holes(grid) + 56*bumpiness(heights) + 352 * valleys(grid, heights))
+
 
 class TetrisSearchProblem(search.SearchProblem):
     def __init__(self, lookahead=1):
@@ -292,14 +319,14 @@ def test_tetris(ntrial=10, heuristic=evaluate_state, watchGames=False):
 
             lines_cleared = 0
             for j in range(len(game_replay)-1):
-                before = get_height(game_replay[j])
-                after = get_height(game_replay[j+1])
+                before = max(get_height_list(game_replay[j]))
+                after = max(get_height_list(game_replay[j+1]))
                 if after < before:
                     lines_cleared += before - after
 
             print "Lines cleared: " + str(lines_cleared)
 
-            with open('gameLogs/trial_2'+str(i)+'_linesCleared='+str(lines_cleared)+'.txt', 'w') as fout:
+            with open('gameLogs/trial_3'+str(i)+'_linesCleared='+str(lines_cleared)+'.txt', 'w') as fout:
                 for g in game_replay:
                     fout.write(str(g))
                     fout.write('\n')
@@ -311,9 +338,9 @@ def test_tetris(ntrial=10, heuristic=evaluate_state, watchGames=False):
     print "Total Lines: " + str(total_lines) + " in " + str(ntrial) + " games."
 
 def main():
-    search_problem = TetrisSearchProblem()
+    search_problem = TetrisSearchProblem(lookahead=1)
     if TESTMODE:
-        test_tetris(10, watchGames=False)
+        test_tetris(1, watchGames=True)
     else:
         find_tetris(search_problem)
 
@@ -332,5 +359,5 @@ def watchReplay(filename):
 
 if __name__ == '__main__':
     main()
-    #watchReplay('gameLogs/trial8_linesCleared=53.txt')
+    #watchReplay('gameLogs/trial_23_linesCleared=5.txt')
 
