@@ -147,12 +147,23 @@ def parameterizedSearch(problem, FrontierDataStructure, priorityFunction=None, h
 
         lookahead -= 1
 
-    best_successor_pair = max(evaluated_successors, key=lambda p: heuristic(p[0], problem))
+    # If the lookahead is empty, then we should only use the immediate layer
+    if len(evaluated_successors) == 0:
+        best_imm = max(immediate_successors, key=lambda p: heuristic(p, problem))
+        best_successor = (best_imm, best_imm)
+    else:
+        best_successor_pair = max(evaluated_successors, key=lambda p: heuristic(p[0], problem))
 
-    best_successor = best_successor_pair[1]
-    best_index = immediate_successors.index(best_successor)
-    old_action = successors[best_index]["board"]
-    action = best_successor["board"]
+    # TODO: Sometimes best_index doesn't seem to work correctly, I think
+    # in the case when we're about to lose
+    try:
+        best_successor = best_successor_pair[1]
+        best_index = immediate_successors.index(best_successor)
+        old_action = successors[best_index]["board"]
+        action = best_successor["board"]
+    except:
+       print "Game Over"
+       return (actionHistory + [node["board"]], node)
 
     # TODO: Remove
     # If you want to see how lookahead is working, do this...
