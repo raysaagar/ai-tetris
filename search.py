@@ -62,6 +62,22 @@ class SearchProblem:
      """
      util.raiseNotDefined()
            
+def get_height_list(grid):
+  GRID_HEIGHT = 20
+  GRID_WIDTH = 10
+  heights = []
+  for index in range(GRID_WIDTH):
+    temp = [i for i, x in enumerate([col[index] for col in grid][::-1]) if x != None]
+    heights.append(0 if len(temp) == 0 else max(temp)+1) # 0-indexed lol  
+  return heights
+
+def check_progress(state1, state2):
+  lines_cleared = 0
+  before = max(get_height_list(state1))
+  after = max(get_height_list(state2))
+  if after < before:
+    lines_cleared += before - after
+  return lines_cleared
 
 def parameterizedSearch(problem, FrontierDataStructure, priorityFunction=None, heuristic=None):
   """
@@ -89,6 +105,8 @@ def parameterizedSearch(problem, FrontierDataStructure, priorityFunction=None, h
   node = problem.getStartState()
   frontier.push((node, []))
   visited.append(node)
+  totalcount = 0
+  print_counter = 0
 
   while not frontier.isEmpty():
     node, actionHistory = frontier.pop()
@@ -181,6 +199,14 @@ def parameterizedSearch(problem, FrontierDataStructure, priorityFunction=None, h
       newActionList = [old_action] + [action]
 
     new_history = actionHistory + newActionList
+
+    if len(new_history) >= 2:
+      totalcount += check_progress(new_history[-2],new_history[-1])
+      print_counter += 1
+    if print_counter >= 10:
+      print "Counted: ", totalcount
+      print_counter = 0
+
     visited.append(best_successor)
     frontier.push((best_successor, new_history if action else []))
 
