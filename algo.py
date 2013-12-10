@@ -300,7 +300,7 @@ def test_tetris(ntrial=10, heuristic=evaluate_state, watchGames=False):
 
     total_lines = []
     for i in range(ntrial):
-        problem = TetrisSearchProblem(lookahead=1)
+        problem = TetrisSearchProblem(lookahead=2)
 
         current_node = None
         
