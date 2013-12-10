@@ -301,11 +301,16 @@ def find_tetris(problem):
             sleep(1)
         return # TODO: remove once we have a real goal state
 
-def test_tetris(ntrial=10, heuristic=evaluate_state, watchGames=False, verbose=False):
+def test_tetris(ntrial=10, lookahead=1, heuristic=evaluate_state, watchGames=False, verbose=False):
     """
     Test harness
     """
 
+    if lookahead < 1:
+        print "Bad Lookahead! Please pick 1 for no lookahead, 2 for 1-piece, etc..."
+        return
+    else:
+        print "Lookahead: " + str(lookahead - 1) + " pieces"
     if verbose:
         print "Verbose Printing Enabled"
     else:
@@ -317,7 +322,7 @@ def test_tetris(ntrial=10, heuristic=evaluate_state, watchGames=False, verbose=F
 
     total_lines = []
     for i in range(ntrial):
-        problem = TetrisSearchProblem(lookahead=2,verbose=verbose)
+        problem = TetrisSearchProblem(lookahead=lookahead,verbose=verbose)
 
         current_node = None
         
@@ -397,7 +402,7 @@ def main():
 
     # AI SIMULATION
     if len(sys.argv) == 6 and (sys.argv[1] == "-t" or sys.argv[1] == "--tetris"):
-        test_tetris(ntrial=int(sys.argv[2]), watchGames=int(sys.argv[4]), verbose=int(sys.argv[5]))
+        test_tetris(ntrial=int(sys.argv[2]), lookahead=int(sys.argv[3]), watchGames=int(sys.argv[4]), verbose=int(sys.argv[5]))
 
 
     # search_problem = TetrisSearchProblem(lookahead=1)
