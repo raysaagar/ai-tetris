@@ -200,12 +200,14 @@ def parameterizedSearch(problem, FrontierDataStructure, priorityFunction=None, h
 
     new_history = actionHistory + newActionList
 
-    if len(new_history) >= 2:
-      totalcount += check_progress(new_history[-2],new_history[-1])
-      print_counter += 1
-    if print_counter >= 10:
-      print "Counted: ", totalcount
-      print_counter = 0
+    if problem.verbose:
+      print "poke"
+      if len(new_history) >= 2:
+        totalcount += check_progress(new_history[-2],new_history[-1])
+        print_counter += 1
+      if print_counter >= 10:
+        print "Counted: ", totalcount
+        print_counter = 0
 
     visited.append(best_successor)
     frontier.push((best_successor, new_history if action else []))

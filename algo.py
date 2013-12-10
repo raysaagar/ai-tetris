@@ -147,11 +147,12 @@ def evaluate_state(state, problem):
 
 
 class TetrisSearchProblem(search.SearchProblem):
-    def __init__(self, lookahead=1):
+    def __init__(self, lookahead=1,verbose=False):
         # Number of pieces for which we want to look ahead for
         # `1` meaning we look only at the next piece
         # `2` meaning we base it off the next two pieces, and so on
         self.lookahead = lookahead
+        self.verbose = verbose
 
         # Generate random sequence of pieces for offline tetris
         NUM_PIECES = 10
@@ -293,23 +294,30 @@ def find_tetris(problem):
             sleep(1)
         return # TODO: remove once we have a real goal state
 
-def test_tetris(ntrial=10, heuristic=evaluate_state, watchGames=False):
+def test_tetris(ntrial=10, heuristic=evaluate_state, watchGames=False, verbose=False):
     """
     Test harness
     """
+    
+    if verbose:
+        print "Verbose Printing Enabled"
+    else:
+        print "Verbose Printing Disabled"
+    if watchGames:
+        print "Game Replay Enabled"
+    else:
+        print "Game Replay Disabled"
 
     total_lines = []
     for i in range(ntrial):
-        problem = TetrisSearchProblem(lookahead=2)
+        problem = TetrisSearchProblem(lookahead=2,verbose=verbose)
 
         current_node = None
         
         # Game loop: keep playing the game until all of the pieces are done
         while current_node is None or len(current_node["pieces"]) > 0:
             game_replay, goal_node = search.aStarSearch(problem, heuristic)
-            print "foo"
             current_node = goal_node
-            #print current_node
 
             if watchGames:
                 for grid in game_replay:
@@ -335,14 +343,8 @@ def test_tetris(ntrial=10, heuristic=evaluate_state, watchGames=False):
 
         total_lines.append(lines_cleared)
 
-    print "Total Lines: " + str(total_lines) + " in " + str(ntrial) + " games."
-
-def main():
-    search_problem = TetrisSearchProblem(lookahead=1)
-    if TESTMODE:
-        test_tetris(1, watchGames=True)
-    else:
-        find_tetris(search_problem)
+    print "Lines by Game: " + str(total_lines)
+    print "Total Lines: " + str(sum(total_lines)) + " in " + str(ntrial) + " games."
 
 def watchReplay(filename):
     with open(filename) as f:
@@ -356,6 +358,47 @@ def watchReplay(filename):
             for p in parselist:
                 print p
             sleep(0.5)
+
+def printHelp():
+    print "Usage: python algo.py [OPTION]"
+    print "\t-h, --help\tPrints this help dialog"
+    print "\t-t, --tetris\tRuns the tetris AI simulation"
+    print "\t\t ARGS: [# trials] [lookahead] [watch replay=0/1] [verbose=0/1]"
+    print "\t-r, --replay\tWatch a game replay"
+    print "\t\t ARGS: [gamelog]"
+    # print "\t-d, --demo\tWatch the class demo"
+
+def main():
+
+    if len(sys.argv) < 2:
+        printHelp()
+        return
+
+    # DEMO
+    # if len(sys.argv) == 2 and (sys.argv[1] == "-d" or sys.argv[1] == "--demo"):
+    #     search_problem = TetrisSearchProblem(lookahead=1)
+    #     find_tetris(search_problem)
+
+    # HELP
+    if len(sys.argv) == 2 or sys.argv[1] == "-h" or sys.argv[1] == "--help":
+        printHelp()
+        return
+
+    # REPLAY MODE
+    if len(sys.argv) == 3 and (sys.argv[1] == "-r" or sys.argv[1] == "--replay"):
+        watchReplay(sys.argv[2])
+
+    # AI SIMULATION
+    if len(sys.argv) == 6 and (sys.argv[1] == "-t" or sys.argv[1] == "--tetris"):
+        test_tetris(ntrial=int(sys.argv[2]), watchGames=int(sys.argv[4]), verbose=int(sys.argv[5]))
+
+
+    # search_problem = TetrisSearchProblem(lookahead=1)
+    # if TESTMODE:
+    #     test_tetris(1, watchGames=True)
+    # else:
+    #     find_tetris(search_problem)
+
 
 if __name__ == '__main__':
     main()
