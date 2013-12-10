@@ -370,7 +370,7 @@ def printHelp():
     print "Usage: python algo.py [OPTIONS]"
     print "\t-h, --help\tPrints this help dialog"
     print "\t-t, --tetris\tRuns the tetris AI simulation"
-    print "\t\t ARGS: [# trials] [lookahead] [watch replay=[0] or 1] [verbose=[0] or 1]"
+    print "\t\t ARGS: [# trials] [lookahead = 1,2,...] [watch replay=0,1] [verbose=0,1]"
     print "\t-r, --replay\tWatch a game replay"
     print "\t\t ARGS: [gamelog]"
     # print "\t-d, --demo\tWatch the class demo"
