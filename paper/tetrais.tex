@@ -67,7 +67,9 @@ Initially, we were worried about the following factors in relation to computatio
 
 \section{Algorithms and Data Structures}
 \subsection{Algorithm}
-\textbf{LOUIS}
+We use a local search algorithm to select the next best piece to use. First, we generate the successor states. When generating the successor states, there is an option to adjust the \textit{lookahead}. A lookahead of $1$ corresponds to only considering the current piece to be laid down. A lookahead of $2$ corresponds to considering the current piece as well as the subsequent piece. A lookahead of $n$ can be specified.
+
+Given a lookahead $n$, the algorithm generates successors for $n$ generations of successors. However, each successor state is also augmented with information about the associated immediate successor. Our heuristics, as described below, are then used to evaluate which lookahead successor is the best, and the associated immediate successor is chosen as the best choice of action at that point in time.
 
 \subsection{Data Structures}
 For our implementation, we used Python and integrated our Tetrais code into an already existing Tetris game implementation. You can find the corresponding source mentioned in our codebase, however, most of the existing Tetris code was ripped out and replaced by Tetrais logic. 
@@ -153,6 +155,25 @@ With additional time, here are some future directions that we would like to cons
 \end{enumerate}
 
 \section{Appendix 1: Examples and Demonstrations}
+
+Because our Tetris agent is able to clear thousands of lines, which means many more pieces are laid down, only part of a trace is shown below. We can run one trial with lookahead $1$ while watching the replay using the command below:
+
+\begin{verbatim}
+python algo.py -t 1 1 1 0
+\end{verbatim}
+
+This runs the simulation and then prints out a replay after finishing using colored ASCII output. To keep track of progress, the last flag can be set to $1$ to enable ``verbose mode'', which prints out the progress of the game. After showing the following output, it begins the replay:
+
+\begin{verbatim}
+Lookahead: 0 pieces
+Verbose Printing Disabled
+Game Replay Enabled
+\end{verbatim}
+
+This is part of the trace, showing a piece being laid down and a line being cleared:
+
+\includegraphics[width=5.0in]{exampleoutput.png}
+
 
 \section{Appendix 2: Documentation}
 \subsection{Prerequisites}
