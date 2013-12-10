@@ -10,6 +10,4 @@ Tetrais - AI Tetris
 
 ### Prerequisites ###
 --------------
-Install pygame using the [binaries](http://www.pygame.org/install.html) for your platform.
-
-For Windows users: Install Colorama library using [PIP for Windows](https://sites.google.com/site/pydatalog/python/pip-for-windows)
+Install Colorama library using pip, or for Windows, [PIP for Windows](https://sites.google.com/site/pydatalog/python/pip-for-windows)
