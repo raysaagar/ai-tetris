@@ -201,7 +201,6 @@ def parameterizedSearch(problem, FrontierDataStructure, priorityFunction=None, h
     new_history = actionHistory + newActionList
 
     if problem.verbose:
-      print "poke"
       if len(new_history) >= 2:
         totalcount += check_progress(new_history[-2],new_history[-1])
         print_counter += 1
