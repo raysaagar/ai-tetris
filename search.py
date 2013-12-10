@@ -7,12 +7,12 @@
 # For more info, see http://inst.eecs.berkeley.edu/~cs188/sp09/pacman.html
 
 """
-Brandon Sim
-Louis Li
-CS182 Problem Set 1
-9/15/13
+Tetrais - Tetris AI
 
-We also collaborated with Saagar Deshpande.
+By Saagar Deshpande, Louis Li, Brandon Sim
+Code based on CS182 Problem Set 1 
+https://bitbucket.org/louisrli/cs182
+
 """
 
 import util

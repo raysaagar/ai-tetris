@@ -8,7 +8,14 @@ import string
 import math
 
 """
-What you need to know:
+Tetrais - Tetris AI
+
+By Saagar Deshpande, Louis Li, Brandon Sim
+
+Tetris game logic based on code from:
+https://github.com/adhit/tetris
+
+Basic game functionalities:
     - Board is represented by a two dimensional matrix, `grid`
     - A state is represented by a dict with keys "board" and "pieces", 
       where "pieces" is the remaining pieces (thus piece[0] is the next piece)
